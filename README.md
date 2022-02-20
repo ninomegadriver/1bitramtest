@@ -1,6 +1,4 @@
-# 1bitramtest
-
-1 BIT RAM TESTER
+# 1 BIT RAM TESTER
 
 Nino MegaDriver - nino@nino.com.br
 
