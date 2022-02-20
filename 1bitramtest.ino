@@ -34,19 +34,20 @@
  */
 
 // Pin configuration
-uint8_t A[]  = { A1, A2, A3, A4, A5, 5, 6, 7, 8, 9};     // Address Inputs
+uint8_t A[]  = { A1, A2, A3, A4, A5, 5, 6, 7, 8, 9}; // Address Inputs
 
-                                                         // Power Pins
-uint8_t    Vcc  = 12;                                    // IMPORTANT: Use only with devices that doesn't 
-uint8_t    GND  = A7;                                    // draw more than 40ma or you'll fry your Arduino.
-                                                         // If it meeds nore, provide external power supply.
+                                                     // Power Pins
+uint8_t    Vcc    = 12;                              // IMPORTANT: Use only with devices that doesn't 
+uint8_t    GND    = A7;                              // draw more than 40ma or you'll fry your Arduino.
+                                                     // If it meeds nore, provide external power supply.
+uint8_t    CS     = A0;                              // Chip select or Chip Enable
+uint8_t    Din    = 11;                              // Data in Pin
+uint8_t    Dout   = A6;                              // Data out Pin
+uint8_t    WE     = 10;                              // Write Enable pin
+int device_size   = 1024;                            // Address range being tested from 0 to device_size
 
-uint8_t    CS   = A0;                                    // Chip select or Chip Enable
-uint8_t    Din  = 11;                                    // Data in Pin
-uint8_t    Dout = A6;                                    // Data out Pin
-uint8_t    WE   = 10;                                    // Write Enable pin
-int device_size = 1024;                                  // Address range being tested from 0 to device_size
-
+uint8_t  writeBit = 1;                               // Value to store when writing
+uint8_t expectBit = 1;                               // Value to expect when reading
 
 // Return the bit value at specified position
 bool getBit(uint16_t data, uint8_t position)
@@ -109,22 +110,24 @@ void loop() {
   Serial.read();
   initialSetup(); // CHIP Initial configuration
   power(true);    // Power on the chip
-  Serial.println("Writing 1 all over it...");
-  for(uint16_t address=0; address<device_size;address++){
+  delay(10);
+  sprintf(ret,"Writing %d all over it...", writeBit);
+  Serial.println(ret);
+  for(uint16_t address=0; address<device_size-1;address++){
     digitalWrite(CS, HIGH); // Disable chip
     address_bits = setAddress(address); // Set the address
-    digitalWrite(Din, HIGH); // would you please save that bit for me?
+    digitalWrite(Din, writeBit); // would you please save that bit for me?
     digitalWrite(WE, LOW); // we're writing now
     digitalWrite(CS, LOW); // Enable chip;
   }
   Serial.println("Reading back...");
-  for(uint16_t address=0; address<device_size;address++){
+  for(uint16_t address=0; address<device_size-1;address++){
     digitalWrite(CS, HIGH); // Disable chip
     address_bits = setAddress(address); // Set the address
     digitalWrite(WE, HIGH); // This time we're reading not writing
     digitalWrite(CS, LOW); // Enable chip
     retval = digitalRead(Dout); // Device: Here's your bit sir!
-    if(retval == 0) // Oops! It's supposed to be 1, this address is bad!
+    if(retval != expectBit ) // Oops! It's supposed to be 1, this address is bad!
     {
       sprintf(ret, "[%s]%0.4X:%d => BAD!", address_bits.c_str(), address, retval);
       errors++;
@@ -135,5 +138,5 @@ void loop() {
   else sprintf(ret, "Test result: ALL GOOD!");
   Serial.println("********************************************");
   Serial.println(ret);
-  power(true);  // Power off the chip
+  power(false);  // Power off the chip, let's not exaust our poor beloved Arduino
 }
