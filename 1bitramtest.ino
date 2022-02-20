@@ -7,7 +7,7 @@
  *  
  * Pin configuration for Arduino Mega 2560:
  * 
- * [Arduino Pin]  [Chip Pina]  [Arduino Pins] 
+ * [Arduino Pin]  [Chip Pins]  [Arduino Pin] 
  * 
  *       A0 <= [~CS         Vcc] => 12
  *       A1 <= [A0     H    Din] => 11
