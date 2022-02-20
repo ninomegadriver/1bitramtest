@@ -19,6 +19,8 @@
  *       A7 <= [GND          A5] => 5
  * 
  * NOTES:
+ *       - For accurate results plug the chip with Arduino powered off, then test,
+ *         then power off again to test another
  *       - Code also compatible with Uno, just change the pin configuration bellow.
  *       - You may use it with HM2510 or any other any x 1bit devices
  *       - Warning: using arduino pins as Vcc and GND, so don't use this setup with
@@ -52,15 +54,29 @@ bool getBit(uint16_t data, uint8_t position)
     return (data >> position) & 0x1;
 }
 
-void setup() {
-  Serial.begin(115200);
+// Initial chip configuration
+void initialSetup(){
   for(int i=0;i<sizeof A;i++) pinMode(A[i], OUTPUT); // Address as outputs
-  pinMode(Vcc,  OUTPUT); digitalWrite(Vcc, HIGH);    // Let's power the chip
-  pinMode(GND,  OUTPUT); digitalWrite(GND, LOW);
   pinMode(Din,  OUTPUT);                             // Device's data in as output
   pinMode(Dout, INPUT);                              // Device's data out as input
   pinMode(CS,   OUTPUT);                             // CE as Output
   pinMode(WE,   OUTPUT);                             // WE as Output
+}
+
+// Power on/off the chip
+void power(bool st){
+  if(st == true){
+    pinMode(Vcc,  OUTPUT); digitalWrite(Vcc, HIGH);  // Power On
+    pinMode(GND,  OUTPUT); digitalWrite(GND, LOW);
+  }else{
+    pinMode(Vcc,  OUTPUT); digitalWrite(Vcc, LOW);   // Power Off
+    pinMode(GND,  OUTPUT); digitalWrite(GND, LOW);
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  power(false);  // We start with the chip powered off
 }
 
 // Set an address on the chip and return a String for debugging purposes
@@ -91,6 +107,8 @@ void loop() {
   Serial.println("********************************************");
   while(!Serial.available() ){ } // Let's pause until the user is ready
   Serial.read();
+  initialSetup(); // CHIP Initial configuration
+  power(true);    // Power on the chip
   Serial.println("Writing 1 all over it...");
   for(uint16_t address=0; address<device_size;address++){
     digitalWrite(CS, HIGH); // Disable chip
@@ -112,10 +130,10 @@ void loop() {
       errors++;
       Serial.println(ret);
     }
-    
   }
   if(errors>0) sprintf(ret, "Test result: BAD, %d bad addresse(s) found", errors);
   else sprintf(ret, "Test result: ALL GOOD!");
   Serial.println("********************************************");
   Serial.println(ret);
+  power(true);  // Power off the chip
 }
