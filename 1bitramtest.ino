@@ -35,9 +35,9 @@
 uint8_t A[]  = { A1, A2, A3, A4, A5, 5, 6, 7, 8, 9};     // Address Inputs
 
                                                          // Power Pins
-uint8_t    Vcc  = 12;                                    // IMPORTANT: Use only with devices that dosen't 
+uint8_t    Vcc  = 12;                                    // IMPORTANT: Use only with devices that doesn't 
 uint8_t    GND  = A7;                                    // draw more than 40ma or you'll fry your Arduino.
-                                                         // If it needs nore, provide external power supply.
+                                                         // If it meeds nore, provide external power supply.
 
 uint8_t    CS   = A0;                                    // Chip select or Chip Enable
 uint8_t    Din  = 11;                                    // Data in Pin
@@ -95,7 +95,7 @@ void loop() {
   for(uint16_t address=0; address<device_size;address++){
     digitalWrite(CS, HIGH); // Disable chip
     address_bits = setAddress(address); // Set the address
-    digitalWrite(Din, HIGH); // would you pleas save that bit for me?
+    digitalWrite(Din, HIGH); // would you please save that bit for me?
     digitalWrite(WE, LOW); // we're writing now
     digitalWrite(CS, LOW); // Enable chip;
   }
