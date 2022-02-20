@@ -25,6 +25,9 @@
  *                  devices that draw 40ma or more, otherwise you'll fry your arduino
  *                  if the device requires more current, isolate the pins and provide
  *                  an external power source
+ *                  
+ * Use the serial monitor at 115200 to do the testing.
+ * 
  * 
  */
 
@@ -76,7 +79,6 @@ String setAddress(uint16_t address){
   return ret;
 }
 
-
 void loop() {
   char ret[100];
   uint8_t retval;
@@ -116,5 +118,4 @@ void loop() {
   else sprintf(ret, "Test result: ALL GOOD!");
   Serial.println("********************************************");
   Serial.println(ret);
-
 }
